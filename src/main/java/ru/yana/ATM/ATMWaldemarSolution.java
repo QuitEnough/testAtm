@@ -1,9 +1,8 @@
-package ru.yana;
+package ru.yana.ATM;
 
 import lombok.Getter;
 import lombok.Setter;
 
-import java.awt.*;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;

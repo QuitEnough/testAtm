@@ -1,4 +1,4 @@
-package ru.yana;
+package ru.yana.ATM;
 
 import java.util.Comparator;
 import java.util.HashMap;
