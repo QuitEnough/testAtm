@@ -3,6 +3,7 @@ package ru.yana.DocumentRelation;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.*;
 
@@ -28,8 +29,8 @@ public class RecommenderServiceImpl<Document, User> implements RecommenderServic
         return allDocuments.stream()
                 .sorted((doc1, doc2) ->
                         Double.compare(
-                                scorer.getScore(doc1, user),
-                                scorer.getScore(doc2, user)
+                                scorer.getScore(doc2, user),
+                                scorer.getScore(doc1, user)
                         ))
                 .limit(limit)
                 .toList();
@@ -56,13 +57,23 @@ public class RecommenderServiceImpl<Document, User> implements RecommenderServic
 
             for (int i = 0; i < allDocuments.size(); i++) {
                 var doc = allDocuments.get(i);
-                if (doc instanceof TDocument) {
+                if (doc instanceof TDocument && tDoc.getUrl().equals(url)) {
                     var processedDoc = processor.process(group.getProcessedDocument());
                     allDocuments.set(i, (Document) processedDoc);
                     return;
                 }
             }
         }
+    }
+
+    // Вспомогательные методы для тестирования
+    public TDocument getDocumentByUrl(String url) {
+        DocumentGroup group = documentGroups.get(url);
+        return group != null ? processor.process(group.getProcessedDocument()) : null;
+    }
+
+    public int getDocumentCount() {
+        return allDocuments.size();
     }
 
 }
@@ -78,6 +89,7 @@ interface Scorer<Document, User> {
 
 @Data
 @AllArgsConstructor
+@RequiredArgsConstructor
 class TDocument {
     private final String url;
     private final long pubDate;
