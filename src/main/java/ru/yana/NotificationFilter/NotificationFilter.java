@@ -14,6 +14,7 @@ public class NotificationFilter {
     private final NotificationHistoryService notificationHistoryService;
 
     public List<Notification> filter(List<Notification> notifications, Long senderId) {
+        if (senderId == null) throw new IllegalArgumentException("senderId cannot be null");
         if (notifications.isEmpty()) return Collections.emptyList();
 
         return notifications
@@ -33,11 +34,13 @@ public class NotificationFilter {
                     List<Notification> recentNotifications = notificationHistoryService
                             .getNotificationsSentLast24Hours(recipientId);
 
-                    return !recentNotifications
+                    return recentNotifications
                             .stream()
-                            .anyMatch(recent ->
-                                    recent.id().equals(notification.id()) &&
-                                    recent.recipientId().equals(recipientId));
+                            .noneMatch(recent ->
+                                    recent.id().equals(notification.id()) ||
+                                    (recent.notificationType().equals(notification.notificationType()) &&
+                                    recent.recipientId().equals(recipientId) &&
+                                    recent.message().equals(notification.message())));
                 })
                 .toList();
     }
